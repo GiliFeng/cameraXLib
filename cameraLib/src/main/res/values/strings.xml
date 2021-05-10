@@ -1,0 +1,4 @@
+<resources>
+    <string name="camera_permission">"本功能需要相机权限！"</string>
+    <string name="content_permission">"本功能需要存储权限！"</string>
+</resources>

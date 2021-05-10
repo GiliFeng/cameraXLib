@@ -4,16 +4,20 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.BitmapRegionDecoder;
+import android.graphics.Color;
 import android.graphics.Matrix;
+import android.graphics.Paint;
 import android.graphics.Rect;
 import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.annotation.IntDef;
 
@@ -75,7 +79,7 @@ public class CameraView extends FrameLayout {
     /**
      * 用于显示提示证 "请对齐身份证正面" 之类的
      */
-    private ImageView hintView;
+    private TextView hintView;
 
     public ICameraControl getCameraControl() {
         return cameraControl;
@@ -84,19 +88,23 @@ public class CameraView extends FrameLayout {
     public void setOrientation(@Orientation int orientation) {
         cameraControl.setDisplayOrientation(orientation);
     }
+    private Context context;
 
     public CameraView(Context context) {
         super(context);
+        this.context=context;
         init();
     }
 
     public CameraView(Context context, AttributeSet attrs) {
         super(context, attrs);
+        this.context=context;
         init();
     }
 
     public CameraView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        this.context=context;
         init();
     }
 
@@ -122,13 +130,14 @@ public class CameraView extends FrameLayout {
         maskView.setVisibility(VISIBLE);
         hintView.setVisibility(VISIBLE);
 
-        int hintResourceId = R.drawable.bd_ocr_hint_align_id_card;
+        String hintStr =context.getString(R.string.camera_hint_back);
         switch (maskType) {
             case MaskView.MASK_TYPE_ID_CARD_FRONT:
-                hintResourceId = R.drawable.bd_ocr_hint_align_id_card;
+
+                hintStr = context.getString(R.string.camera_hint_back);
                 break;
             case MaskView.MASK_TYPE_ID_CARD_BACK:
-                hintResourceId = R.drawable.bd_ocr_hint_align_id_card_back;
+                hintStr = context.getString(R.string.camera_hint_front);
                 break;
             case MaskView.MASK_TYPE_NONE:
             default:
@@ -137,7 +146,7 @@ public class CameraView extends FrameLayout {
                 break;
         }
 
-        hintView.setImageResource(hintResourceId);
+        hintView.setText(hintStr);
     }
 
     private void init() {
@@ -153,7 +162,9 @@ public class CameraView extends FrameLayout {
         maskView = new MaskView(getContext());
         addView(maskView);
 
-        hintView = new ImageView(getContext());
+        hintView = new TextView(getContext());
+        hintView.setTextColor(Color.WHITE);
+        hintView.setTextSize(14);
         addView(hintView);
     }
 
@@ -162,13 +173,20 @@ public class CameraView extends FrameLayout {
         displayView.layout(left, 0, right, bottom - top);
         maskView.layout(left, 0, right, bottom - top);
 
-        int hintViewWidth = DimensionUtil.dpToPx(150);
+        int hintViewWidth = DimensionUtil.dpToPx(getTxtWidth());
         int hintViewHeight = DimensionUtil.dpToPx(25);
 
         int hintViewLeft = (getWidth() - hintViewWidth) / 2;
-        int hintViewTop = maskView.getFrameRect().bottom + DimensionUtil.dpToPx(16);
+        int hintViewTop = maskView.getFrameRect().bottom + DimensionUtil.dpToPx(8);
 
         hintView.layout(hintViewLeft, hintViewTop, hintViewLeft + hintViewWidth, hintViewTop + hintViewHeight);
+    }
+    private int getTxtWidth(){
+        Paint paint = new Paint();
+        paint.setTextSize(14);
+        String text=hintView.getText().toString();
+        float size = paint.measureText(text);
+        return (int)size;
     }
 
     /**

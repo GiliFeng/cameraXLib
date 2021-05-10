@@ -11,7 +11,7 @@ camerax身份证拍照
 }
 }
 2.dependencies {
-	implementation 'com.github.GiliFeng:cameraLib:Tag'
+	implementation 'com.github.GiliFeng:cameraLib:1.00'
 }
 二.使用
 1.传入照片的名称

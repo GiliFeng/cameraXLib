@@ -181,7 +181,7 @@ public class CameraView extends FrameLayout {
 
         hintView.layout(hintViewLeft, hintViewTop, hintViewLeft + hintViewWidth, hintViewTop + hintViewHeight);
     }
-    private int getTxtWidth(){
+    private int getTxtWidth(){/***获取text长度**/
         Paint paint = new Paint();
         paint.setTextSize(14);
         String text=hintView.getText().toString();

@@ -25,11 +25,13 @@ public class KCameraLayout extends FrameLayout {
     private View contentView;
     private View centerView;
     private View leftDownView;
+    private View leftUpView;
     private View rightUpView;
 
     private int contentViewId;
     private int centerViewId;
     private int leftDownViewId;
+    private int leftUpViewId;
     private int rightUpViewId;
 
     public void setOrientation(int orientation) {
@@ -67,6 +69,7 @@ public class KCameraLayout extends FrameLayout {
             contentViewId = a.getResourceId(R.styleable.OCRCameraLayout_contentView, -1);
             centerViewId = a.getResourceId(R.styleable.OCRCameraLayout_centerView, -1);
             leftDownViewId = a.getResourceId(R.styleable.OCRCameraLayout_leftDownView, -1);
+            leftUpViewId=a.getResourceId(R.styleable.OCRCameraLayout_leftUpView,-1);
             rightUpViewId = a.getResourceId(R.styleable.OCRCameraLayout_rightUpView, -1);
         } finally {
             a.recycle();
@@ -85,6 +88,9 @@ public class KCameraLayout extends FrameLayout {
         }
         if (rightUpViewId != -1) {
             rightUpView = findViewById(rightUpViewId);/**闪光灯**/
+        }
+        if (leftUpViewId !=-1){/***点击退出activity**/
+            leftUpView =findViewById(leftUpViewId);
         }
     }
 
@@ -133,6 +139,12 @@ public class KCameraLayout extends FrameLayout {
                 top = contentHeight + (heightLeft - rightUpView.getMeasuredHeight()) / 2;
                 rightUpView.layout(left, top, left + rightUpView.getMeasuredWidth(), top + rightUpView.getMeasuredHeight());
             }
+            if(leftUpView!=null){
+                MarginLayoutParams leftUpViewLayoutParams = (MarginLayoutParams) leftUpView.getLayoutParams();
+                left = leftUpViewLayoutParams.leftMargin;
+                top = contentHeight + (heightLeft - leftUpView.getMeasuredHeight()) / 2;
+                leftUpView.layout(left, top, left + leftUpView.getMeasuredWidth(), top + leftUpView.getMeasuredHeight());
+            }
         } else {
             int contentWidth =width- DimensionUtil.dpToPx(130);//height * 4/3
             int widthLeft = width - contentWidth;
@@ -164,6 +176,12 @@ public class KCameraLayout extends FrameLayout {
                 left = contentWidth + (widthLeft - rightUpView.getMeasuredWidth()) / 2;
                 top = rightUpViewLayoutParams.topMargin;
                 rightUpView.layout(left, top, left + rightUpView.getMeasuredWidth(), top + rightUpView.getMeasuredHeight());
+            }
+            if(leftUpView!=null){
+                MarginLayoutParams leftUpViewLayoutParams = (MarginLayoutParams) leftUpView.getLayoutParams();
+                left = leftUpViewLayoutParams.topMargin;
+                top = leftUpViewLayoutParams.topMargin;
+                leftUpView.layout(left, top, left + leftUpView.getMeasuredWidth(), top + leftUpView.getMeasuredHeight());
             }
         }
     }

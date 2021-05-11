@@ -8,7 +8,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:contentView="@+id/camera_view"
-    app:centerView="@+id/take_photo_button">
+    app:centerView="@+id/take_photo_button"
+    app:leftDownView="@+id/go_back_button">
 
     <com.kin.cameralib.camera.CameraView
         android:id="@+id/camera_view"
@@ -21,6 +22,15 @@
         android:layout_height="58dp"
         android:clickable="true"
         android:background="@drawable/bd_ocr_take_photo_selector" />
+    <ImageView
+        android:id="@+id/go_back_button"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_marginBottom="40dp"
+        android:layout_marginLeft="@dimen/camera_left_margin"
+        android:layout_marginStart="@dimen/camera_left_margin"
+        android:padding="12dp"
+        android:src="@drawable/bd_ocr_back" />
 
 </com.kin.cameralib.camera.KCameraLayout>
 

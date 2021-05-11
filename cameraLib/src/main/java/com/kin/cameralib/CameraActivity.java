@@ -84,6 +84,7 @@ public class CameraActivity extends AppCompatActivity {
         cameraView = (CameraView) findViewById(R.id.camera_view);
         cameraView.getCameraControl().setPermissionCallback(permissionCallback);
         findViewById(R.id.take_photo_button).setOnClickListener(takeButtonOnClickListener);
+        findViewById(R.id.go_back_button).setOnClickListener(closeButtonOnClickListener);
 
         // confirm result;
         displayImageView = (ImageView) findViewById(R.id.display_image_view);

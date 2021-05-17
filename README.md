@@ -14,6 +14,7 @@ dependencies {<br>
 	implementation 'com.github.GiliFeng:cameraLib:1.03' <br>
 } <br>
 ### 二.使用
+```java
  new CameraStart(MainActivity.this, new CameraEndCallBack() { <br>
                     @Override <br>
                     public void cameraEnd(File outFile) { <br>
@@ -21,6 +22,7 @@ dependencies {<br>
                         imageView.setImageURI(Uri.fromFile(outFile)); <br>
                     } <br>
                 }); <br>
+```
 ### 三.添加权限  存储权限以及照相权限
  \<uses-permission android:name="android.permission.CAMERA" /> <br>
  \<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" /> <br>

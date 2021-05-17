@@ -32,9 +32,12 @@ import com.kin.cameralib.R;
 import com.kin.cameralib.camera.CameraView;
 import com.kin.cameralib.camera.KCameraLayout;
 import com.kin.cameralib.camera.MaskView;
+import com.kin.cameralib.camera.event.BaseEvent;
 import com.kin.cameralib.camera.util.HideNavBarUtil;
 import com.kin.cameralib.camera.util.PermissionCallback;
 import com.kin.cameralib.camera.util.PicSaveUtil;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.io.File;
 import java.io.IOException;
@@ -94,6 +97,7 @@ public class CameraActivity extends AppCompatActivity {
         setOrientation(getResources().getConfiguration());
         initParams();
     }
+
     @Override
     protected void onStart() {
         super.onStart();
@@ -104,6 +108,7 @@ public class CameraActivity extends AppCompatActivity {
     protected void onStop() {
         super.onStop();
         cameraView.stop();
+        EventBus.getDefault().post(BaseEvent.getInstance("stop"));
     }
 
     private void initParams() {
@@ -205,6 +210,7 @@ public class CameraActivity extends AppCompatActivity {
                 intent.putExtra(CameraActivity.KEY_CONTENT_TYPE, contentType);
                 intent.putExtra(KEY_OUTPUT_FILE_PATH,outputFile);
                 setResult(Activity.RESULT_OK, intent);
+                EventBus.getDefault().post(BaseEvent.getInstance(outputFile));/**EventBus***/
                 finish();
             }
         }.start();

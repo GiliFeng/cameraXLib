@@ -3,16 +3,20 @@ camerax身份证拍照
 ## 接入指南
 ### 一.接入
 1.在build.gradle的allprojects中添加 <br>
+```java
 allprojects { <br>
 	repositories { <br>
 	...<br>
 	maven { url 'https://jitpack.io' }<br>
 }<br>
 }<br>
+```
 2.在build.gradle中添加依赖 <br>
-dependencies {<br>
-	implementation 'com.github.GiliFeng:cameraLib:1.03' <br>
-} <br>
+```java
+dependencies {
+	implementation 'com.github.GiliFeng:cameraLib:1.03'
+}
+```
 ### 二.使用
 ```java
  new CameraStart(MainActivity.this, new CameraEndCallBack() { <br>

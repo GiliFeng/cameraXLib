@@ -11,7 +11,7 @@ allprojects { <br>
 }<br>
 2.在build.gradle中添加依赖 <br>
 dependencies {<br>
-	implementation 'com.github.GiliFeng:cameraLib:1.00' <br>
+	implementation 'com.github.GiliFeng:cameraLib:1.03' <br>
 } <br>
 ### 二.使用
  new CameraStart(MainActivity.this, new CameraEndCallBack() { <br>

@@ -28,5 +28,7 @@ dependencies {
                 }); 
 ```
 ### 三.添加权限  存储权限以及照相权限
- \<uses-permission android:name="android.permission.CAMERA" /> <br>
- \<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" /> <br>
+```java
+ <uses-permission android:name="android.permission.CAMERA" /> <br>
+ <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" /> <br>
+ ```

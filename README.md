@@ -3,14 +3,14 @@ camerax身份证拍照
 ## 接入指南
 ### 一.接入
 1.allprojects { <br>
-	repositories { \<br>
-	...\<br>
-	maven { url 'https://jitpack.io' }\<br>
-}\<br>
-}\<br>
-2.dependencies {\<br>
-	implementation 'com.github.GiliFeng:cameraLib:1.00'\<br>
-}\<br>
+	repositories { <br>
+	...<br>
+	maven { url 'https://jitpack.io' }<br>
+}<br>
+}<br>
+2.dependencies {<br>
+	implementation 'com.github.GiliFeng:cameraLib:1.00' <br>
+} <br>
 ### 二.使用
 1.传入照片的名称
 String outputPath = "/kin_" + System.currentTimeMillis() + ".jpg";

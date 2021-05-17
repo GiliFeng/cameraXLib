@@ -1,8 +1,6 @@
-# cameraXLib
-cameraX身份证拍照
 # cameraLib
 camerax身份证拍照
-接入指南
+## 接入指南
 一.接入\n
 1.allprojects {/n
 	repositories {

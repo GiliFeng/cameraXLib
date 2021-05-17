@@ -2,8 +2,8 @@
 camerax身份证拍照
 ## 接入指南
 ### 一.接入
-1.allprojects {\<br>
-	repositories {\<br>
+1.allprojects { <br>
+	repositories { \<br>
 	...\<br>
 	maven { url 'https://jitpack.io' }\<br>
 }\<br>

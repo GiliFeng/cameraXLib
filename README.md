@@ -20,5 +20,5 @@ camerax身份证拍照
                     } <br>
                 }); <br>
 ### 三.添加权限  存储权限以及照相权限
-<uses-permission android:name="android.permission.CAMERA" /> <br>
-<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" /> <br>
+ <uses-permission android:name="android.permission.CAMERA" /> <br>
+ <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" /> <br>

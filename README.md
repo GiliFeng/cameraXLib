@@ -1,17 +1,17 @@
 # cameraLib
 camerax身份证拍照
 ## 接入指南
-一.接入\n
-1.allprojects {/n
-	repositories {
-	...
-	maven { url 'https://jitpack.io' }
-}
-}
-2.dependencies {
-	implementation 'com.github.GiliFeng:cameraLib:1.00'
-}
-二.使用
+### 一.接入
+1.allprojects {\<br>
+	repositories {\<br>
+	...\<br>
+	maven { url 'https://jitpack.io' }\<br>
+}\<br>
+}\<br>
+2.dependencies {\<br>
+	implementation 'com.github.GiliFeng:cameraLib:1.00'\<br>
+}\<br>
+### 二.使用
 1.传入照片的名称
 String outputPath = "/kin_" + System.currentTimeMillis() + ".jpg";
 Intent intent = new Intent(MainActivity.this, CameraActivity.class);

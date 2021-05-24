@@ -28,9 +28,9 @@ public class MainActivity extends AppCompatActivity {
         tvFront.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                new CameraStart(MainActivity.this, new CameraEndCallBack() {
+                CameraStart.start(MainActivity.this, new CameraEndCallBack() {
                     @Override
-                    public void cameraEnd(File outFile) {
+                    public void cameraEnd(int resultCode, File outFile) {
                         ImageView imageView = findViewById(R.id.photo);
                         imageView.setImageURI(Uri.fromFile(outFile));
                     }

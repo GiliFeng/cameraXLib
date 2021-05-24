@@ -7,6 +7,7 @@ import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
@@ -33,14 +34,11 @@ import com.kin.cameralib.camera.CameraView;
 import com.kin.cameralib.camera.KCameraLayout;
 import com.kin.cameralib.camera.MaskView;
 import com.kin.cameralib.camera.event.BaseEvent;
+import com.kin.cameralib.camera.util.CameraEndCallBack;
 import com.kin.cameralib.camera.util.HideNavBarUtil;
 import com.kin.cameralib.camera.util.PermissionCallback;
 import com.kin.cameralib.camera.util.PicSaveUtil;
-
-import org.greenrobot.eventbus.EventBus;
-
 import java.io.File;
-import java.io.IOException;
 
 public class CameraActivity extends AppCompatActivity {
     public static final String KEY_OUTPUT_FILE_PATH = "outputFilePath";
@@ -49,7 +47,6 @@ public class CameraActivity extends AppCompatActivity {
     public static final String CONTENT_TYPE_GENERAL = "general";
     public static final String CONTENT_TYPE_ID_CARD_FRONT = "IDCardFront";
     public static final String CONTENT_TYPE_ID_CARD_BACK = "IDCardBack";
-    public static final String CONTENT_TYPE_BANK_CARD = "bankCard";
 
     private static final int REQUEST_CODE_PICK_IMAGE = 100;
     private static final int PERMISSIONS_REQUEST_CAMERA = 800;
@@ -73,6 +70,15 @@ public class CameraActivity extends AppCompatActivity {
             return false;
         }
     };
+    /***初始化activity以及传值***/
+    private static CameraEndCallBack cameraEndCallbacks;
+
+    public static void newInstance(Context context, CameraEndCallBack cameraEndCallbacks) {
+        Intent starter = new Intent(context, CameraActivity.class);
+        CameraActivity.cameraEndCallbacks=cameraEndCallbacks;
+        context.startActivity(starter);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -108,7 +114,6 @@ public class CameraActivity extends AppCompatActivity {
     protected void onStop() {
         super.onStop();
         cameraView.stop();
-        EventBus.getDefault().post(BaseEvent.getInstance("stop"));
     }
 
     private void initParams() {
@@ -179,6 +184,7 @@ public class CameraActivity extends AppCompatActivity {
         public void onClick(View v) {
             setResult(Activity.RESULT_CANCELED);
             cameraView.stop();
+            cameraEndCallbacks.cameraEnd(-1001,null);
             finish();
         }
     };
@@ -191,7 +197,7 @@ public class CameraActivity extends AppCompatActivity {
                 Bitmap bitmap = ((BitmapDrawable) displayImageView.getDrawable()).getBitmap();
                 if (Build.VERSION.SDK_INT >= 23) {
                     int REQUEST_CODE_CONTACT = 101;
-                    String[] permissions ={
+                    String[] permissions = {
                             Manifest.permission.WRITE_EXTERNAL_STORAGE};
                     //验证是否许可权限
                     for (String str : permissions) {
@@ -201,16 +207,12 @@ public class CameraActivity extends AppCompatActivity {
                             Toast.makeText(getApplicationContext(), R.string.content_permission, Toast.LENGTH_LONG)
                                     .show();
                             return;
-                        }else{
-                            PicSaveUtil.saveImageToGallery(getApplicationContext(),bitmap,outputFile,outputPath);
+                        } else {
+                            PicSaveUtil.saveImageToGallery(getApplicationContext(), bitmap, outputFile, outputPath);
                         }
                     }
                 }
-                Intent intent = new Intent();
-                intent.putExtra(CameraActivity.KEY_CONTENT_TYPE, contentType);
-                intent.putExtra(KEY_OUTPUT_FILE_PATH,outputFile);
-                setResult(Activity.RESULT_OK, intent);
-                EventBus.getDefault().post(BaseEvent.getInstance(outputFile));/**EventBus***/
+                cameraEndCallbacks.cameraEnd(Activity.RESULT_OK,outputFile);
                 finish();
             }
         }.start();
@@ -303,7 +305,7 @@ public class CameraActivity extends AppCompatActivity {
             @Override
             public void run() {
                 try {
-                    Thread.sleep(1000);//休眠3秒
+                    Thread.sleep(100);//休眠0.1秒,当没有给与权限时，直接返回
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }

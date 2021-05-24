@@ -19,13 +19,13 @@ dependencies {
 ```
 ### 二.使用
 ```java
- new CameraStart(MainActivity.this, new CameraEndCallBack() { 
-                    @Override 
-                    public void cameraEnd(File outFile) { 
-                        ImageView imageView = findViewById(R.id.photo); 
-                        imageView.setImageURI(Uri.fromFile(outFile)); 
-                    } 
-                }); 
+CameraStart.start(MainActivity.this, new CameraEndCallBack() {
+                    @Override
+                    public void cameraEnd(int resultCode, File outFile) {
+                        ImageView imageView = findViewById(R.id.photo);
+                        imageView.setImageURI(Uri.fromFile(outFile));
+                    }
+                });
 ```
 ### 三.添加权限  存储权限以及照相权限
 ```java

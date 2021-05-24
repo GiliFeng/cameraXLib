@@ -301,16 +301,17 @@ public class CameraActivity extends AppCompatActivity {
         }
     }
     private void stopWithoutPermission(){
-        this.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Thread.sleep(100);//休眠0.1秒,当没有给与权限时，直接返回
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                closeButtonOnClickListener.onClick(null);
-            }
-        });
+        finish();
+//        this.runOnUiThread(new Runnable() {
+//            @Override
+//            public void run() {
+//                try {
+//                    Thread.sleep(100);//休眠0.1秒,当没有给与权限时，直接返回
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
+//                closeButtonOnClickListener.onClick(null);
+//            }
+//        });
     }
 }

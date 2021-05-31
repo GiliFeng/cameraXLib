@@ -14,12 +14,12 @@ allprojects {
 2.在build.gradle中添加依赖 <br>
 ```java
 dependencies {
-	implementation 'com.github.GiliFeng:cameraLib:1.03'
+	implementation 'com.github.GiliFeng:cameraXLib:1.1.0'
 }
 ```
 ### 二.使用
 ```java
-CameraStart.start(MainActivity.this, new CameraEndCallBack() {
+CameraStart.start(MainActivity.this, CameraStart.CONTENT_CAMERA_TYPE.CONTENT_TYPE_ID_CARD_BACK, new CameraEndCallBack() {
                     @Override
                     public void cameraEnd(int resultCode, File outFile) {
                         ImageView imageView = findViewById(R.id.photo);
@@ -32,3 +32,11 @@ CameraStart.start(MainActivity.this, new CameraEndCallBack() {
  <uses-permission android:name="android.permission.CAMERA" /> 
  <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" /> 
  ```
+ ### 四.拍照类型
+ ```java
+   public enum CONTENT_CAMERA_TYPE {
+         CONTENT_TYPE_ID_CARD_FRONT,/**身份证正面***/
+         CONTENT_TYPE_ID_CARD_BACK,/**身份证背面***/
+         CONTENT_TYPE_PERSON,/**人脸识别***/
+     }
+  ```

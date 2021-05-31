@@ -208,7 +208,13 @@ public class CameraActivity extends AppCompatActivity {
                                     .show();
                             return;
                         } else {
-                            PicSaveUtil.saveImageToGallery(getApplicationContext(), bitmap, outputFile, outputPath);
+                            Boolean isComplete=PicSaveUtil.saveImageToGallery(getApplicationContext(), bitmap, outputFile, outputPath);
+                            if (isComplete){/***图片保存到本地成功**/
+                                cameraEndCallbacks.cameraEnd(Activity.RESULT_OK,outputFile);
+                            }else{
+                                Toast.makeText(CameraActivity.this, R.string.get_empty_data, Toast.LENGTH_LONG)
+                                        .show();
+                            }
                         }
                     }
                 }

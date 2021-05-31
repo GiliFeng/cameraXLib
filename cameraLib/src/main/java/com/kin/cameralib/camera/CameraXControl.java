@@ -45,7 +45,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 import static android.content.ContentValues.TAG;
-
 /***
  *Created by wu on 2021/4/30
  **/
@@ -54,7 +53,8 @@ public class CameraXControl implements ICameraControl {
     private PermissionCallback permissionCallback;/**权限**/
     private OnTakePictureCallback onTakePictureCallback;/***拍照回调**/
     private PreviewView mPreviewView;/**预览图**/
-    private int orientation = 0;/**旋转*/
+    private int orientation;
+    public CameraSelector cameraSelect = CameraSelector.DEFAULT_FRONT_CAMERA;/**调整前后摄像头*/
     private Rect previewFrame = new Rect();
     ImageCapture imageCapture;
     ProcessCameraProvider cameraProvider;
@@ -86,7 +86,9 @@ public class CameraXControl implements ICameraControl {
     @SuppressLint("RestrictedApi")
     @Override
     public void resume() {
-        CameraX.unbindAll();
+        if (mCameraControl!=null) {
+            CameraX.unbindAll();
+        }
         openCamera();
     }
 
@@ -149,8 +151,9 @@ public class CameraXControl implements ICameraControl {
         return imageCapture.getFlashMode();
     }
 
-    public CameraXControl(Context activity) {
+    public CameraXControl(Context activity,CameraSelector cameraSelect) {
         this.context = activity;
+        this.cameraSelect=cameraSelect;
         preViewWidth=DimensionUtil.getScreenWidth(context);
         preViewHeight=DimensionUtil.getScreenHeight(context);
         mPreviewView=new PreviewView(context);
@@ -168,6 +171,8 @@ public class CameraXControl implements ICameraControl {
             requestCameraPermission();
             return;
         }
+        // 进行相机画面预览之前，设置想要的实现模式
+        mPreviewView.setPreferredImplementationMode(PreviewView.ImplementationMode.SURFACE_VIEW);
         //初始化相机
         ListenableFuture<ProcessCameraProvider> listenableFuture = ProcessCameraProvider.getInstance(context);
         try {
@@ -182,14 +187,14 @@ public class CameraXControl implements ICameraControl {
             ImageAnalysis imageAnalysis = new ImageAnalysis.Builder()
                     .build();
             imageAnalysis.setAnalyzer(ContextCompat.getMainExecutor(context),
-                            new ImageAnalysis.Analyzer() {
-                                @Override
-                                public void analyze(@NonNull ImageProxy image) {
-                                    image.close();
-                                }
-                            }
-                    );
-            Camera camera= cameraProvider.bindToLifecycle((LifecycleOwner) context, CameraSelector.DEFAULT_BACK_CAMERA, mPreview, imageAnalysis);
+                    new ImageAnalysis.Analyzer() {
+                        @Override
+                        public void analyze(@NonNull ImageProxy image) {
+                            image.close();
+                        }
+                    }
+            );
+            Camera camera= cameraProvider.bindToLifecycle((LifecycleOwner) context, cameraSelect, mPreview, imageAnalysis);
             mCameraControl = camera.getCameraControl();
         } catch (Exception e) {
             e.printStackTrace();
@@ -198,8 +203,11 @@ public class CameraXControl implements ICameraControl {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 Log.e(TAG,"手动对焦");
+                if (mPreviewView==null){
+                    return false;
+                }
                 // TODO 对焦
-                MeteringPointFactory pointFactory=mPreviewView.createMeteringPointFactory(CameraSelector.DEFAULT_BACK_CAMERA);
+                MeteringPointFactory pointFactory=mPreviewView.createMeteringPointFactory(cameraSelect);
                 MeteringPoint meteringPoint = pointFactory.createPoint(event.getX(),event.getY());
                 FocusMeteringAction action = new FocusMeteringAction.Builder(meteringPoint, FocusMeteringAction.FLAG_AF)
                         // auto calling cancelFocusAndMetering in 3 seconds
@@ -222,17 +230,18 @@ public class CameraXControl implements ICameraControl {
         });
     }
     private void takePhoto() {
+        //重新绑定之前必须先取消绑定
+        cameraProvider.unbindAll();
         // 构建图像捕获用例
-          ImageCapture  imageCapture = new ImageCapture.Builder()
-                    //优化捕获速度，可能降低图片质量
-                    .setCaptureMode(ImageCapture.CAPTURE_MODE_MAXIMIZE_QUALITY)
-                    //设置宽高比
-                    .setTargetResolution(new Size(preViewWidth, preViewHeight))
-             //设置初始的旋转角度
-
-                    .build();
-          this.imageCapture=imageCapture;
-        cameraProvider.bindToLifecycle((LifecycleOwner) context, CameraSelector.DEFAULT_BACK_CAMERA, imageCapture);
+        ImageCapture  imageCapture = new ImageCapture.Builder()
+                //优化捕获速度，可能降低图片质量
+                .setCaptureMode(ImageCapture.CAPTURE_MODE_MAXIMIZE_QUALITY)
+                //设置宽高比
+                .setTargetResolution(new Size(preViewWidth, preViewHeight))
+                //设置初始的旋转角度
+                .build();
+        this.imageCapture=imageCapture;
+        cameraProvider.bindToLifecycle((LifecycleOwner) context, cameraSelect, imageCapture);
         imageCapture.takePicture(ContextCompat.getMainExecutor(context), new ImageCapture.OnImageCapturedCallback() {
             @Override
             public void onCaptureSuccess(@NonNull ImageProxy image) {

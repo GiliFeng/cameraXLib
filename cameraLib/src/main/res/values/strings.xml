@@ -1,7 +1,10 @@
 <resources>
     <string name="camera_permission">"Mohon berikan secara manual  { $AppName } Akses ke izin Anda"</string>
     <string name="content_permission">"Mohon berikan secara manual  { $AppName } Akses ke izin Anda"</string>
-    <string name="camera_hint_back">"Tampak Depan KTP"</string>
-    <string name="camera_hint_front">"Tampak Depan KTP"</string>
+    <string name="camera_hint_back">"Alinear el reverso de la identificación con el cuadro mostrado"</string>
+    <string name="camera_hint_front">"Alinear la farte frontal de la identificación con el cuadro mostrado"</string>
+    <string name="camera_hint_person">"Apunte la camara a su rostro dentro del marco mostrado"</string>
+    <string name="camera_title">"Perbandingan wajah"</string>
+    <string name="camera_popwindow_submit">"Konfirmasi"</string>
     <string name="get_empty_data">"Ora entuk data"</string>
 </resources>

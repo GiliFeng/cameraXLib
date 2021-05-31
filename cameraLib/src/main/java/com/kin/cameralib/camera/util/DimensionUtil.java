@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.view.WindowManager;
 
+import static androidx.camera.core.CameraX.getContext;
+
 /***
  *Created by wu on 2021/4/29
  **/
@@ -12,6 +14,11 @@ public class DimensionUtil {
     public static int dpToPx(int dp) {
         return (int) (dp * Resources.getSystem().getDisplayMetrics().density);
     }
+    public static int spToPx(float spValue) {
+        float fontScale = Resources.getSystem().getDisplayMetrics().scaledDensity;
+        return (int) (spValue * fontScale + 0.5f);
+    }
+
     public static int getScreenWidth(Context context) {
         WindowManager manager=(WindowManager) (context.getApplicationContext().getSystemService(Context.WINDOW_SERVICE));
         int screenWidth=  manager.getDefaultDisplay().getWidth();

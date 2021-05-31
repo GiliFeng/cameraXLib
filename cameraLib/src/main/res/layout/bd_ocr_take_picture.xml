@@ -1,7 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-  ~ Copyright (C) 2017 Baidu, Inc. All Rights Reserved.
-  -->
 <com.kin.cameralib.camera.KCameraLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -9,28 +6,51 @@
     android:layout_height="match_parent"
     app:contentView="@+id/camera_view"
     app:centerView="@+id/take_photo_button"
-    app:leftDownView="@+id/go_back_button">
+    app:leftDownView="@+id/go_back_button"
+    app:toolBar="@id/tool_bar">
 
     <com.kin.cameralib.camera.CameraView
         android:id="@+id/camera_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
-
+  <RelativeLayout
+    android:id="@+id/tool_bar"
+    android:layout_width="match_parent"
+    android:layout_height="50dp"
+    android:background="@color/white"
+    android:orientation="horizontal">
     <ImageView
-        android:id="@+id/take_photo_button"
-        android:layout_width="58dp"
-        android:layout_height="58dp"
-        android:clickable="true"
-        android:background="@drawable/bd_ocr_take_photo_selector" />
-    <ImageView
-        android:id="@+id/go_back_button"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:layout_marginBottom="40dp"
-        android:layout_marginLeft="@dimen/camera_left_margin"
-        android:layout_marginStart="@dimen/camera_left_margin"
-        android:padding="12dp"
-        android:src="@drawable/bd_ocr_back" />
+        android:id="@+id/toolbar_back_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bd_global_svg_back"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="10dp"/>
+    <TextView
+        android:id="@+id/tv_take_picture_title"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="CAMERA"
+        android:textColor="@color/black"
+        android:gravity="center"/>
+   </RelativeLayout>
 
-</com.kin.cameralib.camera.KCameraLayout>
+        <ImageView
+            android:id="@+id/take_photo_button"
+            android:layout_width="58dp"
+            android:layout_height="58dp"
+            android:clickable="true"
+            android:background="@drawable/bd_ocr_take_photo_selector" />
+        <ImageView
+            android:id="@+id/go_back_button"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_marginBottom="40dp"
+            android:layout_marginLeft="@dimen/camera_left_margin"
+            android:layout_marginStart="@dimen/camera_left_margin"
+            android:padding="12dp"
+            android:src="@drawable/bd_ocr_back" />
+
+    </com.kin.cameralib.camera.KCameraLayout>
+
 

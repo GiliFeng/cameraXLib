@@ -1,7 +1,11 @@
 package com.kin.cameralib.camera.util;
 
+import android.app.Activity;
+import android.graphics.Color;
 import android.os.Build;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ListPopupWindow;
 import android.widget.PopupWindow;
 import android.widget.Spinner;
@@ -22,7 +26,15 @@ public class HideNavBarUtil {
                     | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY ;
             v.setSystemUiVisibility(uiOptions);
         }
+    }
 
+    public static void hiddenUIMenu(Window window){
+        View decorView = window.getDecorView();
+        decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
+        window.setStatusBarColor(Color.TRANSPARENT);
+        WindowManager.LayoutParams params = window.getAttributes();
+        params.systemUiVisibility = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION|View.SYSTEM_UI_FLAG_IMMERSIVE;
+        window.setAttributes(params);
     }
 
     /**

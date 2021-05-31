@@ -20,8 +20,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.IntDef;
+import androidx.camera.core.CameraSelector;
 
 import com.kin.cameralib.R;
+import com.kin.cameralib.camera.util.BitmapUtil;
 import com.kin.cameralib.camera.util.DimensionUtil;
 import com.kin.cameralib.camera.util.ICameraControl;
 import com.kin.cameralib.camera.util.ImageUtil;
@@ -32,6 +34,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 import static android.content.ContentValues.TAG;
+import static com.kin.cameralib.camera.MaskView.MASK_TYPE_ID_CARD_PERSON;
 
 /***
  *Created by wu on 2021/4/29
@@ -65,8 +68,8 @@ public class CameraView extends FrameLayout {
 
     private CameraViewTakePictureCallback cameraViewTakePictureCallback = new CameraViewTakePictureCallback();
 
-    private ICameraControl cameraControl;
-
+//    private ICameraControl cameraControl;
+    private CameraXControl cameraControl;
     /**
      * 相机预览View
      */
@@ -80,6 +83,7 @@ public class CameraView extends FrameLayout {
      * 用于显示提示证 "请对齐身份证正面" 之类的
      */
     private TextView hintView;
+    private int maskType;/**CameraView 类型***/
 
     public ICameraControl getCameraControl() {
         return cameraControl;
@@ -124,20 +128,23 @@ public class CameraView extends FrameLayout {
         cameraControl.takePicture(cameraViewTakePictureCallback);
     }
 
-    public void setMaskType(@MaskView.MaskType int maskType) {
+    public void setMaskType(int maskType) {
+        this.maskType=maskType;
         maskView.setMaskType(maskType);
 
         maskView.setVisibility(VISIBLE);
         hintView.setVisibility(VISIBLE);
 
-        String hintStr =context.getString(R.string.camera_hint_back);
+        String hintStr =context.getString(R.string.camera_hint_front);
         switch (maskType) {
             case MaskView.MASK_TYPE_ID_CARD_FRONT:
-
-                hintStr = context.getString(R.string.camera_hint_back);
+                hintStr = context.getString(R.string.camera_hint_front);
                 break;
             case MaskView.MASK_TYPE_ID_CARD_BACK:
-                hintStr = context.getString(R.string.camera_hint_front);
+                hintStr = context.getString(R.string.camera_hint_back);
+                break;
+            case MASK_TYPE_ID_CARD_PERSON:
+                hintStr = context.getString(R.string.camera_hint_person);
                 break;
             case MaskView.MASK_TYPE_NONE:
             default:
@@ -145,7 +152,6 @@ public class CameraView extends FrameLayout {
                 hintView.setVisibility(INVISIBLE);
                 break;
         }
-
         hintView.setText(hintStr);
     }
 
@@ -155,16 +161,18 @@ public class CameraView extends FrameLayout {
 //        } else {
 //            cameraControl = new CameraOriControl(getContext());
 //        }
-        cameraControl = new CameraXControl(getContext());
+        if (DimensionUtil.getScreenWidth(context)>DimensionUtil.getScreenHeight(context)){/**横屏***/
+            cameraControl =new CameraXControl(getContext(), CameraSelector.DEFAULT_BACK_CAMERA);
+        }else{
+            cameraControl =new CameraXControl(getContext(), CameraSelector.DEFAULT_FRONT_CAMERA);
+        }
         displayView = cameraControl.getDisplayView();
         addView(displayView);
-
         maskView = new MaskView(getContext());
         addView(maskView);
-
         hintView = new TextView(getContext());
         hintView.setTextColor(Color.WHITE);
-        hintView.setTextSize(14);
+        hintView.setTextSize(DimensionUtil.spToPx(4));
         addView(hintView);
     }
 
@@ -172,18 +180,22 @@ public class CameraView extends FrameLayout {
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
         displayView.layout(left, 0, right, bottom - top);
         maskView.layout(left, 0, right, bottom - top);
-
-        int hintViewWidth = DimensionUtil.dpToPx(getTxtWidth());
-        int hintViewHeight = DimensionUtil.dpToPx(25);
-
-        int hintViewLeft = (getWidth() - hintViewWidth) / 2;
-        int hintViewTop = maskView.getFrameRect().bottom + DimensionUtil.dpToPx(8);
-
-        hintView.layout(hintViewLeft, hintViewTop, hintViewLeft + hintViewWidth, hintViewTop + hintViewHeight);
+        /****拍照底下的介绍文字***/
+        if (DimensionUtil.getScreenWidth(context)>DimensionUtil.getScreenHeight(context)){/***横屏**/
+            int hintViewWidth = DimensionUtil.dpToPx(getTxtWidth());
+            int hintViewHeight = DimensionUtil.dpToPx(40);
+            int hintViewLeft = (getWidth() - hintViewWidth) / 2;
+            int hintViewTop = maskView.getFrameRect().bottom + DimensionUtil.dpToPx(8);
+            hintView.layout(hintViewLeft, hintViewTop, hintViewLeft + hintViewWidth, hintViewTop + hintViewHeight);
+        }else{
+            int hintViewHeight = DimensionUtil.dpToPx(40);
+            int hintViewTop = maskView.getFrameRect().bottom + DimensionUtil.dpToPx(8);
+            hintView.layout(DimensionUtil.dpToPx(20), hintViewTop, getWidth()-DimensionUtil.dpToPx(20), hintViewTop + hintViewHeight);
+        }
     }
     private int getTxtWidth(){/***获取text长度**/
         Paint paint = new Paint();
-        paint.setTextSize(14);
+        paint.setTextSize(DimensionUtil.spToPx(4));
         String text=hintView.getText().toString();
         float size = paint.measureText(text);
         return (int)size;
@@ -202,21 +214,25 @@ public class CameraView extends FrameLayout {
     @SuppressWarnings("ResultOfMethodCallIgnored")
     private Bitmap crop(File outputFile, File imageFile, int rotation) {
         try {
+            Bitmap orimap=BitmapUtil.decodeFile(imageFile.getAbsolutePath());/***原图片**/
             // BitmapRegionDecoder不会将整个图片加载到内存。
             BitmapRegionDecoder decoder = BitmapRegionDecoder.newInstance(imageFile.getAbsolutePath(), false);
-
             Rect previewFrame = cameraControl.getPreviewFrame();
-
             int width = rotation % 180 == 0 ? decoder.getWidth() : decoder.getHeight();
             int height = rotation % 180 == 0 ? decoder.getHeight() : decoder.getWidth();
 
             Rect frameRect = maskView.getFrameRect();
-            int left = width * frameRect.left / maskView.getWidth();
-            int top = height * frameRect.top / maskView.getHeight();
-            int right = width * (frameRect.right) / maskView.getWidth();
-            int bottom = height * frameRect.bottom / maskView.getHeight();
-            Log.e(TAG,"照片尺寸"+ decoder.getWidth()+"---"+width+"---"+frameRect.left+"---"+frameRect.right+"---"+maskView.getWidth());
-
+            int left =frameRect.left;
+            int top = frameRect.top;
+            int right = frameRect.right;
+            int bottom = frameRect.bottom;
+            if (DimensionUtil.getScreenWidth(context)>DimensionUtil.getScreenHeight(context)) {/**横屏***/
+                left=frameRect.left+(width-previewFrame.width())/2;
+                right=frameRect.right+(width-previewFrame.width())/2;
+            }else{
+                top=frameRect.top+(height-previewFrame.height())/2;
+                bottom=frameRect.bottom+(height-previewFrame.height())/2;
+            }
             // 高度大于图片
             if (previewFrame.top < 0) {
                 // 宽度对齐。
@@ -244,13 +260,11 @@ public class CameraView extends FrameLayout {
                     right = rightInFrame * width / previewFrame.width();
                 }
             }
-
             Rect region = new Rect();
-            region.left = left+(DimensionUtil.dpToPx(130)-DimensionUtil.getStatusHeight(getContext()))/2;/**需要去除状态栏的影响**/
-            region.top = top;
-            region.right = right-(DimensionUtil.dpToPx(130)-DimensionUtil.getStatusHeight(getContext()))/2;
-            region.bottom = bottom;
-
+                region.left = left;
+                region.top = top;
+                region.right = right;
+                region.bottom = bottom;
             // 90度或者270度旋转
             if (rotation % 180 == 90) {
                 int x = decoder.getWidth() / 2;
@@ -281,6 +295,9 @@ public class CameraView extends FrameLayout {
             options.inTargetDensity = size;
 
             Bitmap bitmap = decoder.decodeRegion(region, options);
+            if (this.maskType==MASK_TYPE_ID_CARD_PERSON) {/**自拍,前置摄像头左右翻转***/
+               bitmap=BitmapUtil.convertBmp(bitmap);
+            }
             if (rotation != 0) {
                 // 只能是裁剪完之后再旋转了。有没有别的更好的方案呢？
                 Matrix matrix = new Matrix();

@@ -42,4 +42,6 @@ dependencies {
     implementation "androidx.camera:camera-lifecycle:${camerax_version}"
     implementation"androidx.camera:camera-view:1.0.0-alpha12"
     implementation "androidx.camera:camera-extensions:1.0.0-alpha12"
+    //StatusBarUtil
+//    implementation 'com.jaeger.statusbarutil:library:1.5.1'
 }

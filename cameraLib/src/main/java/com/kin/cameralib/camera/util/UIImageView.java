@@ -15,6 +15,8 @@ import android.widget.ImageView;
 
 import androidx.annotation.Nullable;
 
+import com.kin.cameralib.R;
+
 /***
  *Created by wu on 2021/4/29
  **/
@@ -52,43 +54,69 @@ public class UIImageView extends ImageView {
         //防抖动
         mPaint.setDither(true);
         //画笔的颜色
-        mPaint.setColor(Color.WHITE);
+        mPaint.setColor(getResources().getColor(R.color.yellow));
         mPaint.setStyle(Paint.Style.STROKE);
-        mPaint.setStrokeWidth(4);
+        mPaint.setStrokeWidth(10);
         mPath=new Path();
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
-        int contentH=(int)(height * 0.72f);
-        int contentW = contentH * 620 / 400;
-//        int contentW=(int)(width * 0.72f);
-//        int contentH = contentW * 400 / 620;
-        int padLeft = (width-contentW)/2;
-        int padTop=(height-contentH)/2;
+        if (width>height){/***横屏***/
+            int contentH=(int)(height * 0.72f);
+            int contentW = contentH * 620 / 400;
+            int padLeft = (width-contentW)/2;
+            int padTop=(height-contentH)/2;
 
-        mRectF = new RectF(padLeft, padTop, contentW+padLeft,contentH+padTop);
-        Rect rect = null;/**是否裁剪，不裁剪则为null**/
-        Drawable drawable = getDrawable();
-        if (drawable == null) {
-            return;
-        }
-        if (getWidth() == 0 || getHeight() == 0) {
-            return;
-        }
-        //获取图片，转化为Bitmap
-        Bitmap b =  ((BitmapDrawable)drawable).getBitmap();
-        if(null == b)
-        {
-            return;
-        }
-        //将图片转为32位ARGB位图，保证图片质量
-        Bitmap bitmap = b.copy(Bitmap.Config.ARGB_8888, true);
+            mRectF = new RectF(padLeft, padTop, contentW+padLeft,contentH+padTop);
+            Rect rect = null;/**是否裁剪，不裁剪则为null**/
+            Drawable drawable = getDrawable();
+            if (drawable == null) {
+                return;
+            }
+            if (getWidth() == 0 || getHeight() == 0) {
+                return;
+            }
+            //获取图片，转化为Bitmap
+            Bitmap b =  ((BitmapDrawable)drawable).getBitmap();
+            if(null == b)
+            {
+                return;
+            }
+            //将图片转为32位ARGB位图，保证图片质量
+            Bitmap bitmap = b.copy(Bitmap.Config.ARGB_8888, true);
+            //path划出一个圆角矩形，容纳图片,图片矩形区域设置比红色外框小，否则会覆盖住外框，随意控制
+            mPath.addRoundRect(mRectF, 30, 30, Path.Direction.CW);
+            canvas.drawRoundRect(mRectF, 30, 30, mPaint); //画出红色外框圆角矩形
+            canvas.clipPath(mPath);//将canvas裁剪到path设定的区域，往后的绘制都只能在此区域中，
+            canvas.drawBitmap(bitmap,rect,mRectF,mPaint);
+        }else{
+            int contentW=(int)(width * 0.8f);
+            int contentH=contentW;
+            int padLeft = (width-contentW)/2;
+            int padTop=(height-contentH)/2;
 
-        //path划出一个圆角矩形，容纳图片,图片矩形区域设置比红色外框小，否则会覆盖住外框，随意控制
-        mPath.addRoundRect(mRectF, 30, 30, Path.Direction.CW);
-        canvas.drawRoundRect(mRectF, 30, 30, mPaint); //画出红色外框圆角矩形
-        canvas.clipPath(mPath);//将canvas裁剪到path设定的区域，往后的绘制都只能在此区域中，
-        canvas.drawBitmap(bitmap,rect,mRectF,mPaint);
+            Drawable drawable = getDrawable();
+            if (drawable == null) {
+                return;
+            }
+            if (getWidth() == 0 || getHeight() == 0) {
+                return;
+            }
+            //获取图片，转化为Bitmap
+            Bitmap b =  ((BitmapDrawable)drawable).getBitmap();
+            if(null == b)
+            {
+                return;
+            }
+            //将图片转为32位ARGB位图，保证图片质量
+            Bitmap bitmap = b.copy(Bitmap.Config.ARGB_8888, true);
+            mRectF = new RectF(padLeft, padTop, contentW+padLeft,contentH+padTop);
+            //path划出一个圆角矩形，容纳图片,图片矩形区域设置比红色外框小，否则会覆盖住外框，随意控制
+            mPath.addRoundRect(mRectF, width/2, width/2, Path.Direction.CW);
+            canvas.drawRoundRect(mRectF, width/2, width/2, mPaint); //画出白色外框圆角矩形
+            canvas.clipPath(mPath);//将canvas裁剪到path设定的区域，往后的绘制都只能在此区域中，
+            canvas.drawBitmap(bitmap,null,mRectF,mPaint);
+        }
     }
 }

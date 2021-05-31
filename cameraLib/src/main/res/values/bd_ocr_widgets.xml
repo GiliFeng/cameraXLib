@@ -9,5 +9,6 @@
         <attr name="leftDownView" format="reference"/>
         <attr name="rightUpView" format="reference"/>
         <attr name="leftUpView" format="reference"/>
+        <attr name="toolBar" format="reference"/>
     </declare-styleable>
 </resources>

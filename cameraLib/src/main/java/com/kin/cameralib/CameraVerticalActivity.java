@@ -1,7 +1,6 @@
 package com.kin.cameralib;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.UiThread;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
@@ -13,7 +12,6 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Build;
@@ -22,28 +20,33 @@ import android.os.Environment;
 import android.os.Handler;
 import android.provider.MediaStore;
 import android.text.TextUtils;
+import android.view.MotionEvent;
 import android.view.Surface;
 import android.view.View;
+import android.view.Window;
 import android.view.WindowManager;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.PopupWindow;
+import android.widget.TextView;
 import android.widget.Toast;
 
-import com.kin.cameralib.R;
 import com.kin.cameralib.camera.CameraView;
 import com.kin.cameralib.camera.KCameraLayout;
 import com.kin.cameralib.camera.MaskView;
+import com.kin.cameralib.camera.util.BitmapUtil;
 import com.kin.cameralib.camera.util.CameraEndCallBack;
 import com.kin.cameralib.camera.util.HideNavBarUtil;
 import com.kin.cameralib.camera.util.PermissionCallback;
 import com.kin.cameralib.camera.util.PicSaveUtil;
+import com.kin.cameralib.camera.util.PopWindowUtil;
+
 import java.io.File;
+
 import static com.kin.cameralib.CameraStart.CONTENT_CAMERA_TYPE.CONTENT_TYPE_ID_CARD_FRONT;
 
-public class CameraActivity extends AppCompatActivity {
+public class CameraVerticalActivity extends AppCompatActivity {
     public static final String KEY_OUTPUT_FILE_PATH = "outputFilePath";
-/***权限***/
-    private static final int REQUEST_CODE_PICK_IMAGE = 100;/***相册选择照片**/
+    /***权限***/
     private static final int PERMISSIONS_REQUEST_CAMERA = 800;/***拍照**/
     private static final int PERMISSIONS_EXTERNAL_STORAGE = 801;/***文件存储**/
 
@@ -58,7 +61,7 @@ public class CameraActivity extends AppCompatActivity {
     private PermissionCallback permissionCallback = new PermissionCallback() {
         @Override
         public boolean onRequestPermission() {
-            ActivityCompat.requestPermissions(CameraActivity.this,
+            ActivityCompat.requestPermissions(CameraVerticalActivity.this,
                     new String[] {Manifest.permission.CAMERA},
                     PERMISSIONS_REQUEST_CAMERA);
             return false;
@@ -69,16 +72,19 @@ public class CameraActivity extends AppCompatActivity {
     private static CameraStart.CONTENT_CAMERA_TYPE contentType;/***相机类型**/
 
     public static void newInstance(Context context, CameraStart.CONTENT_CAMERA_TYPE camera_type, CameraEndCallBack cameraEndCallbacks) {
-        Intent starter = new Intent(context, CameraActivity.class);
-        CameraActivity.cameraEndCallbacks=cameraEndCallbacks;
-        CameraActivity.contentType=camera_type;
+        Intent starter = new Intent(context, CameraVerticalActivity.class);
+        CameraVerticalActivity.cameraEndCallbacks=cameraEndCallbacks;
+        CameraVerticalActivity.contentType=camera_type;
         context.startActivity(starter);
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_camera);
+        setContentView(R.layout.activity_camera_vertical);
+        /**设置状态栏字体颜色**/
+//        StatusBarUtil.setTranslucentForImageViewInFragment(this, 0, null);
+//        StatusBarUtil.setLightMode(this);
         /***隐藏虚拟键盘**/
         HideNavBarUtil.hideBottomUIMenu(getWindow().getDecorView());
         /**隐藏状态栏**/
@@ -90,14 +96,36 @@ public class CameraActivity extends AppCompatActivity {
         cameraView.getCameraControl().setPermissionCallback(permissionCallback);
         findViewById(R.id.take_photo_button).setOnClickListener(takeButtonOnClickListener);
         findViewById(R.id.go_back_button).setOnClickListener(closeButtonOnClickListener);
-
+        findViewById(R.id.toolbar_back_button).setOnClickListener(closeButtonOnClickListener);
+        /**title信息***/
+        TextView tv_title=findViewById(R.id.tv_take_picture_title);
+        tv_title.setText(R.string.camera_title);
         // confirm result;
         displayImageView = (ImageView) findViewById(R.id.display_image_view);
+        displayImageView.setBackgroundResource(R.color.white);
         confirmResultContainer.findViewById(R.id.confirm_button).setOnClickListener(confirmButtonOnClickListener);
         confirmResultContainer.findViewById(R.id.cancel_button).setOnClickListener(confirmCancelButtonOnClickListener);
-
         setOrientation(getResources().getConfiguration());
         initParams();
+        showPopwindow();
+    }
+    private PopupWindow popupWindow;
+    private void showPopwindow(){
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+             popupWindow =PopWindowUtil.showInfo(CameraVerticalActivity.this);
+            }
+        }, 500);//3秒后执行Runnable中的run方法
+    }
+
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent event){
+        if(popupWindow!=null&&popupWindow.isShowing()){
+            return false;
+        }
+        return super.dispatchTouchEvent(event);
     }
 
     @Override
@@ -135,7 +163,7 @@ public class CameraActivity extends AppCompatActivity {
                 maskType = MaskView.MASK_TYPE_ID_CARD_PERSON;
                 break;
             default:
-                maskType = MaskView.MASK_TYPE_ID_CARD_FRONT;
+                maskType = MaskView.MASK_TYPE_NONE;
                 break;
         }
         cameraView.setMaskType(maskType);
@@ -159,7 +187,7 @@ public class CameraActivity extends AppCompatActivity {
         }
     };
 
-    private CameraView.OnTakePictureCallback takePictureCallback = new CameraView.OnTakePictureCallback() {
+    private final CameraView.OnTakePictureCallback takePictureCallback = new CameraView.OnTakePictureCallback() {
         @Override
         public void onPictureTaken(final Bitmap bitmap) {
             handler.post(new Runnable() {
@@ -203,17 +231,16 @@ public class CameraActivity extends AppCompatActivity {
                                     .show();
                             return;
                         } else {
-                          Boolean isComplete=PicSaveUtil.saveImageToGallery(getApplicationContext(), bitmap, outputFile, outputPath);
-                          if (isComplete){/***图片保存到本地成功**/
-                              cameraEndCallbacks.cameraEnd(Activity.RESULT_OK,outputFile);
-                          }else{
-                              Toast.makeText(CameraActivity.this, R.string.get_empty_data, Toast.LENGTH_LONG)
-                                      .show();
-                          }
+                            Boolean isComplete=PicSaveUtil.saveImageToGallery(getApplicationContext(), bitmap, outputFile, outputPath);
+                            if (isComplete){/***图片保存到本地成功**/
+                                cameraEndCallbacks.cameraEnd(Activity.RESULT_OK,outputFile);
+                            }else{
+                                Toast.makeText(CameraVerticalActivity.this, R.string.get_empty_data, Toast.LENGTH_LONG)
+                                        .show();
+                            }
                         }
                     }
                 }
-
                 finish();
             }
         }.start();
@@ -303,16 +330,5 @@ public class CameraActivity extends AppCompatActivity {
     }
     private void stopWithoutPermission(){
         finish();
-//        this.runOnUiThread(new Runnable() {
-//            @Override
-//            public void run() {
-//                try {
-//                    Thread.sleep(100);//休眠0.1秒,当没有给与权限时，直接返回
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                }
-//                closeButtonOnClickListener.onClick(null);
-//            }
-//        });
     }
 }

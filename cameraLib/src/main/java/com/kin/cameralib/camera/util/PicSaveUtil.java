@@ -28,7 +28,8 @@ import static android.content.ContentValues.TAG;
  **/
 public class PicSaveUtil {
     //保存资源文件中的图片到本地相册,实时刷新
-    public static void saveImageToGallery(Context context, Bitmap bmp,File file,String fileName){
+    public static boolean saveImageToGallery(Context context, Bitmap bmp,File file,String fileName){
+        boolean isComplete=true;
         if (Build.VERSION.SDK_INT < 29) {
             try {
                 FileOutputStream fos = new FileOutputStream(file);
@@ -36,8 +37,10 @@ public class PicSaveUtil {
                 fos.flush();
                 fos.close();
             } catch (FileNotFoundException e) {
+                isComplete=false;
                 e.printStackTrace();
             } catch (IOException e) {
+                isComplete=false;
                 e.printStackTrace();
             }
             Log.e(TAG, "saveImageToGallery: " + file.getAbsolutePath() + "-----" + fileName);
@@ -45,6 +48,7 @@ public class PicSaveUtil {
             try {
                 MediaStore.Images.Media.insertImage(context.getContentResolver(), file.getAbsolutePath(), fileName, null);
             } catch (FileNotFoundException e) {
+                isComplete=false;
                 e.printStackTrace();
             }
             // 最后通知图库更新
@@ -65,10 +69,13 @@ public class PicSaveUtil {
                 }
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
+                isComplete=false;
             } catch (IOException e) {
                 e.printStackTrace();
+                isComplete=false;
             }
         }
+        return isComplete;
     }
 
 

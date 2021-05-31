@@ -24,11 +24,38 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        TextView tvFront=findViewById(R.id.tvFront);
-        tvFront.setOnClickListener(new View.OnClickListener() {
+        TextView tvFront=findViewById(R.id.tv_front);
+        TextView tv_back=findViewById(R.id.tv_back);
+        TextView tv_person=findViewById(R.id.tv_person);
+        tv_person.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                CameraStart.start(MainActivity.this, new CameraEndCallBack() {
+                CameraStart.start(MainActivity.this, CameraStart.CONTENT_CAMERA_TYPE.CONTENT_TYPE_PERSON, new CameraEndCallBack() {
+                    @Override
+                    public void cameraEnd(int resultCode, File outFile) {
+                        ImageView imageView = findViewById(R.id.photo);
+                        imageView.setImageURI(Uri.fromFile(outFile));
+                    }
+                });
+
+            }
+        });
+        tv_back.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                CameraStart.start(MainActivity.this, CameraStart.CONTENT_CAMERA_TYPE.CONTENT_TYPE_ID_CARD_BACK, new CameraEndCallBack() {
+                    @Override
+                    public void cameraEnd(int resultCode, File outFile) {
+                        ImageView imageView = findViewById(R.id.photo);
+                        imageView.setImageURI(Uri.fromFile(outFile));
+                    }
+                });
+            }
+        });
+        tvFront.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                CameraStart.start(MainActivity.this, CameraStart.CONTENT_CAMERA_TYPE.CONTENT_TYPE_ID_CARD_FRONT, new CameraEndCallBack() {
                     @Override
                     public void cameraEnd(int resultCode, File outFile) {
                         ImageView imageView = findViewById(R.id.photo);

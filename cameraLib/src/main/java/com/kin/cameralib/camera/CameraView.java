@@ -20,6 +20,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.IntDef;
+import androidx.camera.core.CameraSelector;
 
 import com.kin.cameralib.R;
 import com.kin.cameralib.camera.util.DimensionUtil;
@@ -155,7 +156,7 @@ public class CameraView extends FrameLayout {
 //        } else {
 //            cameraControl = new CameraOriControl(getContext());
 //        }
-        cameraControl = new CameraXControl(getContext());
+        cameraControl = new CameraXControl(getContext(), CameraSelector.DEFAULT_BACK_CAMERA);
         displayView = cameraControl.getDisplayView();
         addView(displayView);
 

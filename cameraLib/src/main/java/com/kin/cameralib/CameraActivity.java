@@ -218,7 +218,6 @@ public class CameraActivity extends AppCompatActivity {
                         }
                     }
                 }
-                cameraEndCallbacks.cameraEnd(Activity.RESULT_OK,outputFile);
                 finish();
             }
         }.start();
@@ -306,6 +305,21 @@ public class CameraActivity extends AppCompatActivity {
                 break;
         }
     }
+
+    private long exitTime = 0;
+    @Override
+    public void onBackPressed() {
+        if ((System.currentTimeMillis() - exitTime) > 2000) {
+            Toast.makeText(getApplicationContext(), R.string.back_sure, Toast.LENGTH_LONG)
+                    .show();
+            exitTime = System.currentTimeMillis();
+        } else {
+            cameraView.stop();
+            cameraEndCallbacks.cameraEnd(-1001,null);
+            finish();
+        }
+    }
+
     private void stopWithoutPermission(){
         finish();
 //        this.runOnUiThread(new Runnable() {

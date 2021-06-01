@@ -32,7 +32,7 @@ public class PopWindowUtil {
         pw.setBackgroundDrawable(context.getDrawable(R.drawable.bd_popwindow_circle));
 
         backgroundAlpha(0.5f,context);
-//        pw.setAnimationStyle(R.style.nornal_style); // 设置动画
+        pw.setAnimationStyle(R.style.pop_window_scale_anim); // 设置动画
         KCameraLayout takePictureContainer = (KCameraLayout) context.findViewById(R.id.take_picture_container);
 //方法二
         pw.showAtLocation(takePictureContainer, Gravity.CENTER,0,0);

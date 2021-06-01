@@ -15,4 +15,9 @@
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
     </style>
+
+    <style name="pop_window_scale_anim" mce_bogus="1" parent="android:Animation">
+        <item name="android:windowEnterAnimation">@anim/pop_window_scale_in</item>
+        <item name="android:windowExitAnimation">@anim/pop_window_scale_out</item>
+    </style>
 </resources>

@@ -4,6 +4,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.graphics.BitmapRegionDecoder;
 import android.graphics.Rect;
 import android.media.Image;
@@ -36,6 +37,7 @@ import androidx.core.content.ContextCompat;
 import androidx.lifecycle.LifecycleOwner;
 
 import com.google.common.util.concurrent.ListenableFuture;
+import com.kin.cameralib.camera.util.BitmapUtil;
 import com.kin.cameralib.camera.util.DimensionUtil;
 import com.kin.cameralib.camera.util.ICameraControl;
 import com.kin.cameralib.camera.util.PermissionCallback;
@@ -263,4 +265,5 @@ public class CameraXControl implements ICameraControl {
             }
         });
     }
+
 }

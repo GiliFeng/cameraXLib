@@ -217,6 +217,7 @@ public class CameraView extends FrameLayout {
             Bitmap orimap=BitmapUtil.decodeFile(imageFile.getAbsolutePath());/***原图片**/
             // BitmapRegionDecoder不会将整个图片加载到内存。
             BitmapRegionDecoder decoder = BitmapRegionDecoder.newInstance(imageFile.getAbsolutePath(), false);
+
             Rect previewFrame = cameraControl.getPreviewFrame();
             int width = rotation % 180 == 0 ? decoder.getWidth() : decoder.getHeight();
             int height = rotation % 180 == 0 ? decoder.getHeight() : decoder.getWidth();
@@ -224,14 +225,24 @@ public class CameraView extends FrameLayout {
             Rect frameRect = maskView.getFrameRect();
             int left =frameRect.left;
             int top = frameRect.top;
-            int right = frameRect.right;
-            int bottom = frameRect.bottom;
+            int right = left+frameRect.width();
+            int bottom = top+frameRect.height();
             if (DimensionUtil.getScreenWidth(context)>DimensionUtil.getScreenHeight(context)) {/**横屏***/
-                left=frameRect.left+(width-previewFrame.width())/2;
-                right=frameRect.right+(width-previewFrame.width())/2;
+                float ratio = 0.72f;
+                int realHeight = (int) (height * ratio);
+                int realWidth = realHeight * 620 / 400;
+                left = (width - realWidth) / 2;
+                top = (height - realHeight) / 2;
+                right = realWidth + left;
+                bottom = realHeight + top;
             }else{
-                top=frameRect.top+(height-previewFrame.height())/2;
-                bottom=frameRect.bottom+(height-previewFrame.height())/2;
+                float ratio =0.8f;
+                int realWidth =(int)(width * ratio);
+                int realHeight = realWidth;
+                left = (width - realWidth) / 2;
+                top = (height - realHeight) / 2;
+                right = realWidth + left;
+                bottom = realHeight + top;
             }
             // 高度大于图片
             if (previewFrame.top < 0) {
@@ -283,21 +294,16 @@ public class CameraView extends FrameLayout {
 
             BitmapFactory.Options options = new BitmapFactory.Options();
             //            options.inPreferredConfig = Bitmap.Config.RGB_565;
-
             // 最大图片大小。
             int maxPreviewImageSize = 2560;
             int size = Math.min(decoder.getWidth(), decoder.getHeight());
             size = Math.min(size, maxPreviewImageSize);
 
-            options.inSampleSize = ImageUtil.calculateInSampleSize(options, size, size);
-            options.inScaled = true;
             options.inDensity = Math.max(options.outWidth, options.outHeight);
             options.inTargetDensity = size;
-
+            options.inSampleSize = ImageUtil.calculateInSampleSize(options, size, size);
+            options.inScaled = false;
             Bitmap bitmap = decoder.decodeRegion(region, options);
-            if (this.maskType==MASK_TYPE_ID_CARD_PERSON) {/**自拍,前置摄像头左右翻转***/
-               bitmap=BitmapUtil.convertBmp(bitmap);
-            }
             if (rotation != 0) {
                 // 只能是裁剪完之后再旋转了。有没有别的更好的方案呢？
                 Matrix matrix = new Matrix();
@@ -309,6 +315,9 @@ public class CameraView extends FrameLayout {
                     bitmap.recycle();
                 }
                 bitmap = rotatedBitmap;
+            }
+            if (this.maskType==MASK_TYPE_ID_CARD_PERSON) {/**自拍,前置摄像头左右翻转***/
+                bitmap=BitmapUtil.convertBmp(bitmap);
             }
 
             try {

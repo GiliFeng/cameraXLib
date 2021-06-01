@@ -7,4 +7,5 @@
     <string name="camera_title">"Perbandingan wajah"</string>
     <string name="camera_popwindow_submit">"Konfirmasi"</string>
     <string name="get_empty_data">"Ora entuk data"</string>
+    <string name="back_sure">"Silakan klik KEMBALI lagi untuk keluar."</string>
 </resources>

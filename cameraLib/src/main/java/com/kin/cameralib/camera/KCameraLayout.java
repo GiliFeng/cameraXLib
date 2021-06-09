@@ -108,9 +108,10 @@ public class KCameraLayout extends FrameLayout {
         int height = getHeight();
         int left;
         int top;
-        if (r < b) {
-            int contentHeight =width- DimensionUtil.dpToPx(130);// width * 4/3
-            int heightLeft = height - contentHeight;
+        if (r < b) {/***竖屏***/
+            int contentHeight =height- DimensionUtil.dpToPx(130);// width * 4/3
+            int heightTop = height - contentHeight;
+            paint.setColor(Color.argb(100, 255, 255, 255));
             contentView.layout(l, t, r, contentHeight);
 
             backgroundRect.left = 0;
@@ -121,7 +122,7 @@ public class KCameraLayout extends FrameLayout {
             // layout centerView;
             if (centerView != null) {
                 left = (width - centerView.getMeasuredWidth()) / 2;
-                top = contentHeight + (heightLeft - centerView.getMeasuredHeight()) / 2;
+                top = contentHeight + (heightTop - centerView.getMeasuredHeight()) / 2;
                 centerView
                         .layout(left, top, left + centerView.getMeasuredWidth(), top + centerView.getMeasuredHeight());
             }
@@ -129,20 +130,20 @@ public class KCameraLayout extends FrameLayout {
             if (leftDownView!=null){
                 MarginLayoutParams leftDownViewLayoutParams = (MarginLayoutParams) leftDownView.getLayoutParams();
                 left = leftDownViewLayoutParams.leftMargin;
-                top = contentHeight + (heightLeft - leftDownView.getMeasuredHeight()) / 2;
+                top = contentHeight + (heightTop - leftDownView.getMeasuredHeight()) / 2;
                 leftDownView
                         .layout(left, top, left + leftDownView.getMeasuredWidth(), top + leftDownView.getMeasuredHeight());
             }
             if (rightUpView!=null){
                 MarginLayoutParams rightUpViewLayoutParams = (MarginLayoutParams) rightUpView.getLayoutParams();
                 left = width - rightUpView.getMeasuredWidth() - rightUpViewLayoutParams.rightMargin;
-                top = contentHeight + (heightLeft - rightUpView.getMeasuredHeight()) / 2;
+                top = contentHeight + (heightTop - rightUpView.getMeasuredHeight()) / 2;
                 rightUpView.layout(left, top, left + rightUpView.getMeasuredWidth(), top + rightUpView.getMeasuredHeight());
             }
             if(leftUpView!=null){
                 MarginLayoutParams leftUpViewLayoutParams = (MarginLayoutParams) leftUpView.getLayoutParams();
                 left = leftUpViewLayoutParams.leftMargin;
-                top = contentHeight + (heightLeft - leftUpView.getMeasuredHeight()) / 2;
+                top = contentHeight + (heightTop - leftUpView.getMeasuredHeight()) / 2;
                 leftUpView.layout(left, top, left + leftUpView.getMeasuredWidth(), top + leftUpView.getMeasuredHeight());
             }
         } else {

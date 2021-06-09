@@ -212,12 +212,27 @@ public class CameraView extends FrameLayout {
             int height = rotation % 180 == 0 ? decoder.getHeight() : decoder.getWidth();
 
             Rect frameRect = maskView.getFrameRect();
-            int left = width * frameRect.left / maskView.getWidth();
-            int top = height * frameRect.top / maskView.getHeight();
-            int right = width * (frameRect.right) / maskView.getWidth();
-            int bottom = height * frameRect.bottom / maskView.getHeight();
-            Log.e(TAG,"照片尺寸"+ decoder.getWidth()+"---"+width+"---"+frameRect.left+"---"+frameRect.right+"---"+maskView.getWidth());
-
+            int left =frameRect.left;
+            int top = frameRect.top;
+            int right = left+frameRect.width();
+            int bottom = top+frameRect.height();
+            if (DimensionUtil.getScreenWidth(context)>DimensionUtil.getScreenHeight(context)) {/**横屏***/
+                float ratio = 0.72f;
+                int realHeight = (int) (height * ratio);
+                int realWidth = realHeight * 620 / 400;
+                left = (width - realWidth) / 2;
+                top = (height - realHeight) / 2;
+                right = realWidth + left;
+                bottom = realHeight + top;
+            }else{
+                float ratio =0.8f;
+                int realWidth =(int)(width * ratio);
+                int realHeight = realWidth;
+                left = (width - realWidth) / 2;
+                top = (height - realHeight) / 2;
+                right = realWidth + left;
+                bottom = realHeight + top;
+            }
             // 高度大于图片
             if (previewFrame.top < 0) {
                 // 宽度对齐。
@@ -245,11 +260,10 @@ public class CameraView extends FrameLayout {
                     right = rightInFrame * width / previewFrame.width();
                 }
             }
-
             Rect region = new Rect();
-            region.left = left+(DimensionUtil.dpToPx(130)-DimensionUtil.getStatusHeight(getContext()))/2;/**需要去除状态栏的影响**/
+            region.left = left;
             region.top = top;
-            region.right = right-(DimensionUtil.dpToPx(130)-DimensionUtil.getStatusHeight(getContext()))/2;
+            region.right = right;
             region.bottom = bottom;
 
             // 90度或者270度旋转

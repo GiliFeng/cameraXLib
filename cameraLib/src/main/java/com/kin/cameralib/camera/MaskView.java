@@ -116,21 +116,31 @@ public class MaskView extends View {
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
         if (w > 0 && h > 0) {
-            float ratio = h > w ? 0.9f : 0.72f;
-            int height = (int) (h * ratio);
-            int width = height * 620 / 400;
-//            int width = (int) (w * ratio);
-//            int height = width * 400 / 620;
-
-            int left = (w - width) / 2;
-            int top = (h - height) / 2;
-            int right = width + left;
-            int bottom = height + top;
-
-            frame.left = left;
-            frame.top = top;
-            frame.right = right;
-            frame.bottom = bottom;
+            if (h<w){/***横屏**/
+                float ratio = 0.72f;
+                int height = (int) (h * ratio);
+                int width = height * 620 / 400;
+                int left = (w - width) / 2;
+                int top = (h - height) / 2;
+                int right = width + left;
+                int bottom = height + top;
+                frame.left = left;
+                frame.top = top;
+                frame.right = right;
+                frame.bottom = bottom;
+            }else{/**竖屏**/
+                float ratio =0.8f;
+                int width =(int)(w * ratio);
+                int height = width;
+                int left = (w - width) / 2;
+                int top = (h - height) / 2;
+                int right = width + left;
+                int bottom = height + top;
+                frame.left = left;
+                frame.top = top;
+                frame.right = right;
+                frame.bottom = bottom;
+            }
 
         }
     }

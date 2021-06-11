@@ -286,14 +286,14 @@ public class CameraView extends FrameLayout {
             //            options.inPreferredConfig = Bitmap.Config.RGB_565;
 
             // 最大图片大小。
-            int maxPreviewImageSize = 2560;
-            int size = Math.min(decoder.getWidth(), decoder.getHeight());
-            size = Math.min(size, maxPreviewImageSize);
+//             int maxPreviewImageSize = 2560;
+//             int size = Math.min(decoder.getWidth(), decoder.getHeight());
+//             size = Math.min(size, maxPreviewImageSize);
 
-            options.inSampleSize = ImageUtil.calculateInSampleSize(options, size, size);
-            options.inScaled = true;
-            options.inDensity = Math.max(options.outWidth, options.outHeight);
-            options.inTargetDensity = size;
+//             options.inSampleSize = ImageUtil.calculateInSampleSize(options, size, size);
+//             options.inScaled = true;
+//             options.inDensity = Math.max(options.outWidth, options.outHeight);
+//             options.inTargetDensity = size;
 
             Bitmap bitmap = decoder.decodeRegion(region, options);
             if (rotation != 0) {

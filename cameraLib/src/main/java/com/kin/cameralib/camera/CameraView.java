@@ -283,16 +283,15 @@ public class CameraView extends FrameLayout {
 
             BitmapFactory.Options options = new BitmapFactory.Options();
             //            options.inPreferredConfig = Bitmap.Config.RGB_565;
-
             // 最大图片大小。
-//            int maxPreviewImageSize = 2560;
-//            int size = Math.min(decoder.getWidth(), decoder.getHeight());
-//            size = Math.min(size, maxPreviewImageSize);
-//
-//            options.inSampleSize = ImageUtil.calculateInSampleSize(options, size, size);
-//            options.inScaled = true;
-//            options.inDensity = Math.max(options.outWidth, options.outHeight);
-//            options.inTargetDensity = size;
+//             int maxPreviewImageSize = 2560;
+//             int size = Math.min(decoder.getWidth(), decoder.getHeight());
+//             size = Math.min(size, maxPreviewImageSize);
+
+//             options.inSampleSize = ImageUtil.calculateInSampleSize(options, size, size);
+//             options.inScaled = true;
+//             options.inDensity = Math.max(options.outWidth, options.outHeight);
+//             options.inTargetDensity = size;
             Bitmap bitmap = decoder.decodeRegion(region, options);
             if (rotation != 0) {
                 // 只能是裁剪完之后再旋转了。有没有别的更好的方案呢？

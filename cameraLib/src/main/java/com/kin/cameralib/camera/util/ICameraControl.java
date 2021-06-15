@@ -1,5 +1,6 @@
 package com.kin.cameralib.camera.util;
 
+import android.graphics.Bitmap;
 import android.graphics.Rect;
 import android.view.View;
 
@@ -35,6 +36,7 @@ public interface ICameraControl {
      */
     interface OnTakePictureCallback {
         void onPictureTaken(byte[] data);
+        void onPictureTaken(byte[] byteData, Bitmap bitData);
     }
 
     /**

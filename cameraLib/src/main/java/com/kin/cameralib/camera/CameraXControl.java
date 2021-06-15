@@ -4,6 +4,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.graphics.BitmapRegionDecoder;
 import android.graphics.Rect;
 import android.media.Image;
@@ -36,6 +37,7 @@ import androidx.core.content.ContextCompat;
 import androidx.lifecycle.LifecycleOwner;
 
 import com.google.common.util.concurrent.ListenableFuture;
+import com.kin.cameralib.camera.util.BitmapUtil;
 import com.kin.cameralib.camera.util.DimensionUtil;
 import com.kin.cameralib.camera.util.ICameraControl;
 import com.kin.cameralib.camera.util.PermissionCallback;
@@ -54,6 +56,7 @@ public class CameraXControl implements ICameraControl {
     private OnTakePictureCallback onTakePictureCallback;/***拍照回调**/
     private PreviewView mPreviewView;/**预览图**/
     private int orientation;
+    private Size preSize;
     public CameraSelector cameraSelect = CameraSelector.DEFAULT_FRONT_CAMERA;/**调整前后摄像头*/
     private Rect previewFrame = new Rect();
     ImageCapture imageCapture;
@@ -156,6 +159,11 @@ public class CameraXControl implements ICameraControl {
         this.cameraSelect=cameraSelect;
         preViewWidth=DimensionUtil.getScreenWidth(context);
         preViewHeight=DimensionUtil.getScreenHeight(context);
+        if (preViewWidth>preViewHeight){/**横屏**/
+            preSize=new Size(1920,1080);
+        }else{
+            preSize=new Size(1080,1920);
+        }
         mPreviewView=new PreviewView(context);
     }
     private void requestCameraPermission() {
@@ -172,15 +180,14 @@ public class CameraXControl implements ICameraControl {
             return;
         }
         // 进行相机画面预览之前，设置想要的实现模式
-        mPreviewView.setPreferredImplementationMode(PreviewView.ImplementationMode.SURFACE_VIEW);
+//        mPreviewView.setPreferredImplementationMode(PreviewView.ImplementationMode.SURFACE_VIEW);
         //初始化相机
         ListenableFuture<ProcessCameraProvider> listenableFuture = ProcessCameraProvider.getInstance(context);
         try {
             cameraProvider  = listenableFuture.get();
-
             //绑定预览
             Preview mPreview = new Preview.Builder()
-                    .setTargetResolution(new Size(preViewWidth , preViewHeight))
+                    .setTargetResolution(preSize)
                     .build();
             mPreview.setSurfaceProvider(mPreviewView.createSurfaceProvider());
             //构建图像分析用例
@@ -237,7 +244,7 @@ public class CameraXControl implements ICameraControl {
                 //优化捕获速度，可能降低图片质量
                 .setCaptureMode(ImageCapture.CAPTURE_MODE_MAXIMIZE_QUALITY)
                 //设置宽高比
-                .setTargetResolution(new Size(preViewWidth, preViewHeight))
+                .setTargetResolution(preSize)
                 //设置初始的旋转角度
                 .build();
         this.imageCapture=imageCapture;
@@ -249,8 +256,9 @@ public class CameraXControl implements ICameraControl {
                 ByteBuffer buffer = image.getPlanes()[0].getBuffer();
                 byte[] bytes = new byte[buffer.remaining()];
                 buffer.get(bytes);
+                Bitmap bitmap= BitmapUtil.decodeFrameToBitmap(bytes,image.getWidth(),image.getHeight());
                 image.close();
-                onTakePictureCallback.onPictureTaken(bytes);
+                onTakePictureCallback.onPictureTaken(bytes,bitmap);
                 super.onCaptureSuccess(image);
                 isPhoto=false;
             }
@@ -263,3 +271,4 @@ public class CameraXControl implements ICameraControl {
         });
     }
 }
+

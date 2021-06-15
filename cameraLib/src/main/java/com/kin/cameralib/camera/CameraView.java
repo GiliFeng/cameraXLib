@@ -23,6 +23,7 @@ import androidx.annotation.IntDef;
 import androidx.camera.core.CameraSelector;
 
 import com.kin.cameralib.R;
+import com.kin.cameralib.camera.util.BitmapUtil;
 import com.kin.cameralib.camera.util.DimensionUtil;
 import com.kin.cameralib.camera.util.ICameraControl;
 import com.kin.cameralib.camera.util.ImageUtil;
@@ -31,8 +32,6 @@ import com.kin.cameralib.camera.util.ImageUtil;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-
-import static android.content.ContentValues.TAG;
 
 /***
  *Created by wu on 2021/4/29
@@ -286,15 +285,14 @@ public class CameraView extends FrameLayout {
             //            options.inPreferredConfig = Bitmap.Config.RGB_565;
 
             // 最大图片大小。
-            int maxPreviewImageSize = 2560;
-            int size = Math.min(decoder.getWidth(), decoder.getHeight());
-            size = Math.min(size, maxPreviewImageSize);
-
-            options.inSampleSize = ImageUtil.calculateInSampleSize(options, size, size);
-            options.inScaled = true;
-            options.inDensity = Math.max(options.outWidth, options.outHeight);
-            options.inTargetDensity = size;
-
+//            int maxPreviewImageSize = 2560;
+//            int size = Math.min(decoder.getWidth(), decoder.getHeight());
+//            size = Math.min(size, maxPreviewImageSize);
+//
+//            options.inSampleSize = ImageUtil.calculateInSampleSize(options, size, size);
+//            options.inScaled = true;
+//            options.inDensity = Math.max(options.outWidth, options.outHeight);
+//            options.inTargetDensity = size;
             Bitmap bitmap = decoder.decodeRegion(region, options);
             if (rotation != 0) {
                 // 只能是裁剪完之后再旋转了。有没有别的更好的方案呢？
@@ -327,6 +325,106 @@ public class CameraView extends FrameLayout {
         return null;
     }
 
+    private Bitmap cropBitmap(File outputFile, Bitmap orimap, int rotation) {
+        Rect previewFrame = cameraControl.getPreviewFrame();
+        int width = rotation % 180 == 0 ? orimap.getWidth() : orimap.getHeight();
+        int height = rotation % 180 == 0 ? orimap.getHeight() : orimap.getWidth();
+
+        Rect frameRect = maskView.getFrameRect();
+        int left,top,right,bottom;
+        if (DimensionUtil.getScreenWidth(context)>DimensionUtil.getScreenHeight(context)) {/**横屏***/
+            top=(int)(frameRect.top*((float)height/maskView.getHeight()));
+            bottom =(int)(frameRect.bottom*((float)height/maskView.getHeight()));
+            int realWidth=(bottom-top)*620 / 400;
+            left=(width-realWidth)/2;
+            right=left+realWidth;
+        }else{
+            left =(int)(frameRect.left*((float)width/maskView.getWidth()));
+            right =(int)(frameRect.right*((float)width/maskView.getWidth()));
+            int realHeight =right-left;
+            top = (height - realHeight) / 2;
+            bottom = realHeight + top;
+        }
+        // 高度大于图片
+        if (previewFrame.top < 0) {
+            // 宽度对齐。
+            int adjustedPreviewHeight = previewFrame.height() * getWidth() / previewFrame.width();
+            int topInFrame = ((adjustedPreviewHeight - frameRect.height()) / 2)
+                    * getWidth() / previewFrame.width();
+            int bottomInFrame = ((adjustedPreviewHeight + frameRect.height()) / 2) * getWidth()
+                    / previewFrame.width();
+
+            // 等比例投射到照片当中。
+            top = topInFrame * height / previewFrame.height();
+            bottom = bottomInFrame * height / previewFrame.height();
+        } else {
+            // 宽度大于图片
+            if (previewFrame.left < 0) {
+                // 高度对齐
+                int adjustedPreviewWidth = previewFrame.width() * getHeight() / previewFrame.height();
+                int leftInFrame = ((adjustedPreviewWidth - maskView.getFrameRect().width()) / 2) * getHeight()
+                        / previewFrame.height();
+                int rightInFrame = ((adjustedPreviewWidth + maskView.getFrameRect().width()) / 2) * getHeight()
+                        / previewFrame.height();
+
+                // 等比例投射到照片当中。
+                left = leftInFrame * width / previewFrame.width();
+                right = rightInFrame * width / previewFrame.width();
+            }
+        }
+        Rect region = new Rect();
+        region.left = left;
+        region.top = top;
+        region.right = right;
+        region.bottom = bottom;
+        // 90度或者270度旋转
+        if (rotation % 180 == 90) {
+            int x = orimap.getWidth() / 2;
+            int y = orimap.getHeight() / 2;
+
+            int rotatedWidth = region.height();
+            int rotated = region.width();
+
+            // 计算，裁剪框旋转后的坐标
+            region.left = x - rotatedWidth / 2;
+            region.top = y - rotated / 2;
+            region.right = x + rotatedWidth / 2;
+            region.bottom = y + rotated / 2;
+            region.sort();
+        }
+        Bitmap bitmap;
+        if (orimap.getWidth()>region.width()&&orimap.getHeight()>region.height()){
+            bitmap=Bitmap.createBitmap(orimap, region.left, region.top, region.right-region.left, region.bottom-region.top);
+        }else{
+            return null;
+        }
+        if (rotation != 0) {
+            // 只能是裁剪完之后再旋转了。有没有别的更好的方案呢？
+            Matrix matrix = new Matrix();
+            matrix.postRotate(rotation);
+            Bitmap rotatedBitmap = Bitmap.createBitmap(
+                    bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, false);
+            if (bitmap != rotatedBitmap) {
+                // 有时候 createBitmap会复用对象
+                bitmap.recycle();
+            }
+            bitmap = rotatedBitmap;
+        }
+
+        try {
+            if (!outputFile.exists()) {
+                outputFile.createNewFile();
+            }
+            FileOutputStream fileOutputStream = new FileOutputStream(outputFile);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 90, fileOutputStream);
+            fileOutputStream.flush();
+            fileOutputStream.close();
+            return bitmap;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
@@ -376,6 +474,13 @@ public class CameraView extends FrameLayout {
                     }
                 }
             });
+        }
+
+        @Override
+        public void onPictureTaken(byte[] byteData, Bitmap bitData) {
+            final int rotation = ImageUtil.getOrientation(byteData);
+            Bitmap bitmap = cropBitmap(file, bitData, rotation);
+            callback.onPictureTaken(bitmap);
         }
     }
 }

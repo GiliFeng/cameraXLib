@@ -92,7 +92,7 @@ public class UIImageView extends ImageView {
             int contentW=(int)(width * 0.8f);
             int contentH=contentW;
             int padLeft = (width-contentW)/2;
-            int padTop=(height-contentH)/2;
+            int padTop=(height-contentH)/2+DimensionUtil.dpToPx(25);;
 
             Drawable drawable = getDrawable();
             if (drawable == null) {

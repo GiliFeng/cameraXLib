@@ -32,7 +32,6 @@ import androidx.camera.core.MeteringPointFactory;
 import androidx.camera.core.Preview;
 import androidx.camera.lifecycle.ProcessCameraProvider;
 import androidx.camera.view.PreviewView;
-import androidx.camera.view.TextureViewMeteringPointFactory;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.LifecycleOwner;
 
@@ -77,7 +76,7 @@ public class CameraXControl implements ICameraControl {
     @Override
     public void stop() {/**相机释放**/
         if (mCameraControl!=null){
-            CameraX.unbindAll();
+            cameraProvider.unbindAll();
         }
     }
 
@@ -90,7 +89,7 @@ public class CameraXControl implements ICameraControl {
     @Override
     public void resume() {
         if (mCameraControl!=null) {
-            CameraX.unbindAll();
+//            CameraX.unbindAll();
         }
         openCamera();
     }
@@ -189,7 +188,7 @@ public class CameraXControl implements ICameraControl {
             Preview mPreview = new Preview.Builder()
                     .setTargetResolution(preSize)
                     .build();
-            mPreview.setSurfaceProvider(mPreviewView.createSurfaceProvider());
+            mPreview.setSurfaceProvider(mPreviewView.getSurfaceProvider());
             //构建图像分析用例
             ImageAnalysis imageAnalysis = new ImageAnalysis.Builder()
                     .build();
@@ -214,7 +213,7 @@ public class CameraXControl implements ICameraControl {
                     return false;
                 }
                 // TODO 对焦
-                MeteringPointFactory pointFactory=mPreviewView.createMeteringPointFactory(cameraSelect);
+                MeteringPointFactory pointFactory=mPreviewView.getMeteringPointFactory();
                 MeteringPoint meteringPoint = pointFactory.createPoint(event.getX(),event.getY());
                 FocusMeteringAction action = new FocusMeteringAction.Builder(meteringPoint, FocusMeteringAction.FLAG_AF)
                         // auto calling cancelFocusAndMetering in 3 seconds

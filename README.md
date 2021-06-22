@@ -14,7 +14,7 @@ allprojects {
 2.在build.gradle中添加依赖 <br>
 ```java
 dependencies {
-	implementation 'com.github.GiliFeng:cameraLib:1.0.8'
+	implementation 'com.github.GiliFeng:cameraLib:1.0.9'
 }
 ```
 ### 二.使用

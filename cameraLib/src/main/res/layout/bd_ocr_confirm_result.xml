@@ -20,7 +20,7 @@
     <ImageView
         android:id="@+id/cancel_button"
         android:layout_width="60dp"
-        android:layout_height="40dp"
+        android:layout_height="60dp"
         android:layout_marginBottom="@dimen/camera_bottom_margin"
         android:layout_marginLeft="@dimen/camera_left_margin"
         android:layout_marginStart="@dimen/camera_left_margin"
@@ -30,7 +30,7 @@
     <ImageView
         android:id="@+id/confirm_button"
         android:layout_width="60dp"
-        android:layout_height="40dp"
+        android:layout_height="60dp"
         android:layout_marginEnd="@dimen/camera_right_margin"
         android:layout_marginRight="@dimen/camera_right_margin"
         android:layout_marginTop="@dimen/camera_top_margin"

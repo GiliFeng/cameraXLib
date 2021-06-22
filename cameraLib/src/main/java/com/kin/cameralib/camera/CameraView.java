@@ -199,6 +199,7 @@ public class CameraView extends FrameLayout {
      *
      * @return 裁剪好的bitmap。
      */
+    /**未使用**/
     @SuppressWarnings("ResultOfMethodCallIgnored")
     private Bitmap crop(File outputFile, File imageFile, int rotation) {
         try {

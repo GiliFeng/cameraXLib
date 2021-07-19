@@ -1,8 +1,8 @@
 <resources>
-    <string name="camera_permission">"Mohon berikan secara manual  { $AppName } Akses ke izin Anda"</string>
-    <string name="content_permission">"Mohon berikan secara manual  { $AppName } Akses ke izin Anda"</string>
-    <string name="camera_hint_back">"Tampak Depan KTP"</string>
-    <string name="camera_hint_front">"Tampak Depan KTP"</string>
-    <string name="get_empty_data">"Ora entuk data"</string>
-    <string name="back_sure">"Silakan klik KEMBALI lagi untuk keluar."</string>
+    <string name="camera_permission">"โปรดระบุสิทธิ์ของคุณ { $AppName } ด้วยตนเอง"</string>
+    <string name="content_permission">"โปรดระบุสิทธิ์ของคุณ { $AppName } ด้วยตนเอง"</string>
+    <string name="camera_hint_back">"โปรดจัดตำแหน่งด้านหน้าของบัตรประชาชนให้ตรงกับหน้าจอภาพถ่าย"</string>
+    <string name="camera_hint_front">"โปรดจัดตำแหน่งด้านหน้าของบัตรประชาชนให้ตรงกับหน้าจอภาพถ่าย"</string>
+    <string name="get_empty_data">"ข้อมูลว่า งเปล่า"</string>
+    <string name="back_sure">"กรุณาคลิก 'ย้อนกลับ' อีกครั้งเพื่อจบการทํางาน"</string>
 </resources>

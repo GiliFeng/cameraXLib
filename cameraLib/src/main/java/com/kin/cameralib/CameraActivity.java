@@ -107,12 +107,14 @@ public class CameraActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+        if (cameraView!=null)
         cameraView.start();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
+        if (cameraView!=null)
         cameraView.stop();
     }
 
@@ -146,12 +148,14 @@ public class CameraActivity extends AppCompatActivity {
         cameraView.setMaskType(maskType);
     }
     private void showTakePicture() {
+        if (cameraView!=null)
         cameraView.getCameraControl().resume();
         takePictureContainer.setVisibility(View.VISIBLE);
         confirmResultContainer.setVisibility(View.INVISIBLE);
     }
 
     private void showResultConfirm() {
+        if (cameraView!=null)
         cameraView.getCameraControl().pause();
         takePictureContainer.setVisibility(View.INVISIBLE);
         confirmResultContainer.setVisibility(View.VISIBLE);
@@ -160,6 +164,7 @@ public class CameraActivity extends AppCompatActivity {
     private View.OnClickListener takeButtonOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
+            if (cameraView!=null)
             cameraView.takePicture(outputFile, takePictureCallback);
         }
     };
@@ -183,7 +188,9 @@ public class CameraActivity extends AppCompatActivity {
         @Override
         public void onClick(View v) {
             setResult(Activity.RESULT_CANCELED);
+            if (cameraView!=null)
             cameraView.stop();
+            if (cameraEndCallbacks!=null)
             cameraEndCallbacks.cameraEnd(-1001,null);
             finish();
         }
@@ -210,6 +217,7 @@ public class CameraActivity extends AppCompatActivity {
                         } else {
                             Boolean isComplete=PicSaveUtil.saveImageToGallery(getApplicationContext(), bitmap, outputFile, outputPath);
                             if (isComplete){/***图片保存到本地成功**/
+                                if (cameraEndCallbacks!=null)
                                 cameraEndCallbacks.cameraEnd(Activity.RESULT_OK,outputFile);
                             }else{
                                 Toast.makeText(CameraActivity.this, R.string.get_empty_data, Toast.LENGTH_LONG)
@@ -233,6 +241,7 @@ public class CameraActivity extends AppCompatActivity {
     private View.OnClickListener confirmCancelButtonOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
+            if (displayImageView!=null)
             displayImageView.setImageBitmap(null);
             showTakePicture();
         }
@@ -314,24 +323,23 @@ public class CameraActivity extends AppCompatActivity {
                     .show();
             exitTime = System.currentTimeMillis();
         } else {
-            cameraView.stop();
-            cameraEndCallbacks.cameraEnd(-1001,null);
+            if (cameraView!=null) cameraView.stop();
+            if (cameraEndCallbacks!=null) cameraEndCallbacks.cameraEnd(-1001,null);
             finish();
         }
     }
 
     private void stopWithoutPermission(){
-        finish();
-//        this.runOnUiThread(new Runnable() {
-//            @Override
-//            public void run() {
-//                try {
-//                    Thread.sleep(100);//休眠0.1秒,当没有给与权限时，直接返回
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                }
-//                closeButtonOnClickListener.onClick(null);
-//            }
-//        });
+        this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(100);//休眠0.1秒,当没有给与权限时，直接返回
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                closeButtonOnClickListener.onClick(null);
+            }
+        });
     }
 }
